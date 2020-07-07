@@ -92,3 +92,7 @@ iOSInjectionProject/
 # MacOS specific files
 
 .DS_Store
+
+# Sensitive files
+
+GoogleService-Info.plist
