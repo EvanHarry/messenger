@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		200D952A24B4F2A3000987AF /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200D952924B4F2A3000987AF /* DatabaseManager.swift */; };
 		2049A7B824B4D42800D37861 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2049A7B724B4D42800D37861 /* GoogleService-Info.plist */; };
 		2065E76824B46C37003FB3FE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2065E76724B46C37003FB3FE /* AppDelegate.swift */; };
 		2065E76A24B46C37003FB3FE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2065E76924B46C37003FB3FE /* SceneDelegate.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		200D952924B4F2A3000987AF /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		2049A7B724B4D42800D37861 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		2065E76424B46C37003FB3FE /* Messenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messenger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2065E76724B46C37003FB3FE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 				2065E76724B46C37003FB3FE /* AppDelegate.swift */,
 				2065E76924B46C37003FB3FE /* SceneDelegate.swift */,
 				2065E78E24B48154003FB3FE /* Extensions.swift */,
+				200D952924B4F2A3000987AF /* DatabaseManager.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -288,6 +291,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2065E78224B47C83003FB3FE /* LoginViewController.swift in Sources */,
+				200D952A24B4F2A3000987AF /* DatabaseManager.swift in Sources */,
 				2065E78424B47C92003FB3FE /* RegisterViewController.swift in Sources */,
 				2065E78A24B47CDA003FB3FE /* NewConversationViewController.swift in Sources */,
 				2065E76C24B46C37003FB3FE /* ConversationsViewController.swift in Sources */,

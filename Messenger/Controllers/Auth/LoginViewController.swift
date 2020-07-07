@@ -60,7 +60,7 @@ class LoginViewController: UIViewController {
     private let loginButton: UIButton = {
         
         let button = UIButton()
-        button.setTitle("Log in", for: .normal)
+        button.setTitle("Log In", for: .normal)
         button.backgroundColor = .link
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 12
@@ -132,9 +132,13 @@ class LoginViewController: UIViewController {
         }
         
         // Firebase login
-        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { (result, error) in
+        Auth.auth().signIn(withEmail: email, password: password) { [weak self] (result, error) in
             
-            guard let result = result, error == nil else {
+            guard let self = self else {
+                return
+            }
+            
+            guard error == nil else {
                 
                 self.alertUserLoginError(error!.localizedDescription)
                 
@@ -142,8 +146,7 @@ class LoginViewController: UIViewController {
                 
             }
             
-            let user = result.user
-            print("User logged in: \(user)")
+            self.navigationController?.dismiss(animated: true, completion: nil)
             
         }
         

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class ConversationsViewController: UIViewController {
 
@@ -17,13 +18,19 @@ class ConversationsViewController: UIViewController {
         view.backgroundColor = .red
     }
     
-    // Check if the user is signed in.
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        let loggedIn = UserDefaults.standard.bool(forKey: "loggedIn")
+        // Check if the user is signed in.
+        validateAuth()
         
-        if !loggedIn {
+    }
+    
+    private func validateAuth() {
+        
+        let auth = Auth.auth()
+        
+        if auth.currentUser == nil {
             
             let vc = LoginViewController()
             
@@ -33,7 +40,26 @@ class ConversationsViewController: UIViewController {
             
             present(nav, animated: false)
             
+        } else {
+            
+            auth.currentUser?.reload(completion: { (error) in
+                
+                if error != nil {
+                    
+                    do {
+                        try auth.signOut()
+                    } catch {
+                        return
+                    }
+                    
+                    self.validateAuth()
+                    
+                }
+                
+            })
+            
         }
+        
     }
 
 }

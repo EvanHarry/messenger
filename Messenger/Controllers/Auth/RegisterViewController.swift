@@ -110,7 +110,7 @@ class RegisterViewController: UIViewController {
     private let imageView: UIImageView = {
         
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "person")
+        imageView.image = UIImage(systemName: "person.circle")
         imageView.tintColor = .gray
         imageView.contentMode = .scaleAspectFit
         imageView.layer.masksToBounds = true
@@ -126,8 +126,8 @@ class RegisterViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
-                
-        registerButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
+        
+        registerButton.addTarget(self, action: #selector(registerButtonTapped), for: .touchUpInside)
         
         emailField.delegate = self
         firstNameField.delegate = self
@@ -169,7 +169,7 @@ class RegisterViewController: UIViewController {
         
     }
     
-    @objc private func loginButtonTapped() {
+    @objc private func registerButtonTapped() {
         
         emailField.resignFirstResponder()
         firstNameField.resignFirstResponder()
@@ -179,33 +179,50 @@ class RegisterViewController: UIViewController {
         // Email and password are not empty, password has length of at least six.
         guard let email = emailField.text, let firstName = firstNameField.text, let lastName = lastNameField.text, let password = passwordField.text, !email.isEmpty, !firstName.isEmpty, !lastName.isEmpty, !password.isEmpty, password.count >= 6 else {
             
-            alertUserRegisterError()
+            alertUserRegisterError("Please fill out all fields.")
             
             return
             
         }
         
-        // Firebase register
-        FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
+        DatabaseManager.shared.userExists(with: email) { (exists) in
             
-            guard let result = result, error == nil else {
+            guard !exists else {
                 
-                print(error!.localizedDescription)
+                self.alertUserRegisterError("User already exists")
                 
                 return
                 
             }
             
-            let user = result.user!
-            print("Created user: \(user.email)")
+        }
+        
+        // Firebase register
+        Auth.auth().createUser(withEmail: email, password: password) { [weak self] (result, error) in
+            
+            guard let self = self else {
+                return
+            }
+            
+            guard error == nil else {
+                
+                self.alertUserRegisterError(error!.localizedDescription)
+                
+                return
+                
+            }
+            
+            DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName, lastName: lastName, email: email))
+            
+            self.navigationController?.dismiss(animated: true, completion: nil)
             
         }
         
     }
     
-    func alertUserRegisterError() {
+    func alertUserRegisterError(_ errorMessage: String) {
         
-        let alert = UIAlertController(title: "Whoops", message: "Please enter all information to register an account.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Error", message: errorMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
         
         present(alert, animated: true)
@@ -238,7 +255,7 @@ extension RegisterViewController: UITextFieldDelegate {
         } else if textField == lastNameField {
             passwordField.becomeFirstResponder()
         } else if textField == passwordField {
-            loginButtonTapped()
+            registerButtonTapped()
         }
         
         return true
