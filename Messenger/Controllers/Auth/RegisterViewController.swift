@@ -8,8 +8,11 @@
 
 import UIKit
 import FirebaseAuth
+import JGProgressHUD
 
 class RegisterViewController: UIViewController {
+    
+    private let spinner = JGProgressHUD(style: .dark)
     
     private let scrollView: UIScrollView = {
         
@@ -185,7 +188,17 @@ class RegisterViewController: UIViewController {
             
         }
         
-        DatabaseManager.shared.userExists(with: email) { (exists) in
+        spinner.show(in: view)
+        
+        DatabaseManager.shared.userExists(with: email) { [weak self] (exists) in
+            
+            guard let self = self else {
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.spinner.dismiss()
+            }
             
             guard !exists else {
                 
@@ -195,26 +208,21 @@ class RegisterViewController: UIViewController {
                 
             }
             
-        }
-        
-        // Firebase register
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] (result, error) in
-            
-            guard let self = self else {
-                return
+            Auth.auth().createUser(withEmail: email, password: password) {  (result, error) in
+                
+                guard error == nil else {
+                    
+                    self.alertUserRegisterError(error!.localizedDescription)
+                    
+                    return
+                    
+                }
+                
+                DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName, lastName: lastName, email: email))
+                
+                self.navigationController?.dismiss(animated: true, completion: nil)
+                
             }
-            
-            guard error == nil else {
-                
-                self.alertUserRegisterError(error!.localizedDescription)
-                
-                return
-                
-            }
-            
-            DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName, lastName: lastName, email: email))
-            
-            self.navigationController?.dismiss(animated: true, completion: nil)
             
         }
         
