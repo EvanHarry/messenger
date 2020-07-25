@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FirebaseAuth
 import FirebaseDatabase
 
 final class DatabaseManager {
@@ -22,14 +23,13 @@ final class DatabaseManager {
 extension DatabaseManager {
     
     /// Checks whether a user already exists in the database with the provided email
-    public func userExists(with email: String, completion: @escaping((Bool) -> Void)) {
+    public func userExists(with email: String, completion: @escaping (Bool) -> Void) {
         
-        var safeEmail = email.replacingOccurrences(of: ".", with: "-")
-        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
+        let auth = Auth.auth()
         
-        database.child(safeEmail).observeSingleEvent(of: .value) { (snapshot) in
+        auth.fetchSignInMethods(forEmail: email) { (result, error) in
             
-            guard snapshot.value as? String != nil else {
+            guard let result = result, result.count == 0 else {
                 
                 completion(false)
                 
@@ -44,9 +44,21 @@ extension DatabaseManager {
     }
     
     /// Inserts new user to database
-    public func insertUser(with user: ChatAppUser) {
+    public func insertUser(with user: ChatAppUser, completion: @escaping (Bool) -> Void) {
         
-        database.child(user.safeEmail).setValue(["firstName": user.firstName, "lastName": user.lastName])
+        database.child(user.uid).setValue(["firstName": user.firstName, "lastName": user.lastName, "email": user.email], withCompletionBlock: { (error, _) in
+            
+            guard error == nil else {
+                
+                completion(false)
+                
+                return
+                
+            }
+            
+            completion(true)
+            
+        })
         
     }
     
@@ -57,14 +69,10 @@ struct ChatAppUser {
     let firstName: String
     let lastName: String
     let email: String
-    // let profileUrl: String
+    let uid: String
     
-    var safeEmail: String {
-        
-        var safeEmail = email.replacingOccurrences(of: ".", with: "-")
-        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
-        
-        return safeEmail
+    var profilePictureFileName: String {
+        return "\(uid)_profile_picture.png"
     }
     
 }

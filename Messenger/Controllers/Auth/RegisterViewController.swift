@@ -210,7 +210,7 @@ class RegisterViewController: UIViewController {
             
             Auth.auth().createUser(withEmail: email, password: password) {  (result, error) in
                 
-                guard error == nil else {
+                guard error == nil, let result = result else {
                     
                     self.alertUserRegisterError(error!.localizedDescription)
                     
@@ -218,7 +218,36 @@ class RegisterViewController: UIViewController {
                     
                 }
                 
-                DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName, lastName: lastName, email: email))
+                let chatUser = ChatAppUser(firstName: firstName, lastName: lastName, email: email, uid: result.user.uid)
+                
+                DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
+                    
+                    if success {
+                        
+                        guard let image = self.imageView.image, let data = image.pngData() else {
+                            return
+                        }
+                        
+                        let fileName = chatUser.profilePictureFileName
+                        
+                        StorageManager.shared.uploadProfilePicture(with: data, filename: fileName) { result in
+                            
+                            switch result {
+                            case .success(let downloadUrl):
+                                
+                                UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                                
+                                print(downloadUrl)
+                                
+                            case .failure(let error):
+                                print("Error: \(error)")
+                            }
+                            
+                        }
+                        
+                    }
+                    
+                })
                 
                 self.navigationController?.dismiss(animated: true, completion: nil)
                 
